@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1274d2" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Гимнастика" />
+  <title>Производственная гимнастика</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="assets/icons/icon-180.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <header class="topbar glass">
+      <div class="topbar-brand">
+        <div class="topbar-logo-box">
+          <img src="assets/brand/logo-gtt-blue.png" alt="Газпром трансгаз Томск" />
+        </div>
+        <div>
+          <div class="eyebrow">Алтайское ЛПУМГ</div>
+          <h1>Производственная гимнастика</h1>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button id="infoBtn" class="header-btn" aria-label="Информация о производственной гимнастике">Инфо</button>
+      </div>
+    </header>
+
+    <main class="screen-wrap">
+      <section id="screen-home" class="screen active">
+        <div class="hero-card card gradient-card">
+          <div class="hero-avatar-wrap">
+            <div id="avatarHero" class="hero-avatar male">🧑‍💼</div>
+            <button id="avatarToggleBtn" class="ghost-btn small">Сменить персонажа</button>
+          </div>
+          <div class="hero-stats">
+            <div class="eyebrow light">Ваш ежедневный ритуал</div>
+            <h2 id="welcomeText">Добро пожаловать!</h2>
+            <p class="muted light">7–10 минут в день. Один полный комплекс = один активный день прогресса.</p>
+            <div class="chip-row">
+              <div class="stat-chip">
+                <span class="label">Серия</span>
+                <strong id="streakValue">0</strong>
+              </div>
+              <div class="stat-chip">
+                <span class="label">Звёзды</span>
+                <strong id="starsValue">0</strong>
+              </div>
+              <div class="stat-chip">
+                <span class="label">Уровень</span>
+                <strong id="levelValue">1</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-grid">
+          <div class="card info-card compact">
+            <div class="stat-title">Репутация</div>
+            <div id="reputationValue" class="big-stat">0</div>
+            <div class="tiny muted">+10 за завершённый комплекс</div>
+          </div>
+          <div class="card info-card compact">
+            <div class="stat-title">Комплексов всего</div>
+            <div id="complexCountValue" class="big-stat">0</div>
+            <div class="tiny muted">выполнено полностью</div>
+          </div>
+        </div>
+
+        <div class="card action-card">
+          <div>
+            <div class="stat-title">Сегодняшняя активность</div>
+            <p id="todayStatus" class="muted">Сегодня комплекс ещё не завершён.</p>
+          </div>
+          <button class="primary-btn" data-nav="complexes">Перейти к комплексам</button>
+        </div>
+
+        <div class="card info-shortcut-card">
+          <div>
+            <div class="stat-title">О производственной гимнастике</div>
+            <p class="muted">Цель, задачи, требования безопасности и ожидаемый эффект — в отдельном блоке «Инфо».</p>
+          </div>
+          <button class="secondary-btn" data-nav="info">Открыть инфо</button>
+        </div>
+
+        <div class="card info-card">
+          <div class="section-title">Как это работает</div>
+          <ul class="clean-list">
+            <li>Нажмите на любой комплекс — он сразу откроется с анимацией.</li>
+            <li>Внутри нажмите на упражнение №1–6, прочитайте карточку и затем запустите его кнопкой «Старт».</li>
+            <li>После нажатия «Старт» запускается таймер и звучит стартовый сигнал.</li>
+            <li>После полного прохождения комплекса обновляется прогресс, серия и рейтинг.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="screen-complexes" class="screen">
+        <div class="section-header">
+          <h2>Комплексы</h2>
+          <div class="tiny muted">Нажмите сразу на карточку комплекса</div>
+        </div>
+        <div id="complexList" class="complex-list"></div>
+      </section>
+
+      <section id="screen-progress" class="screen">
+        <div class="section-header">
+          <h2>Прогресс</h2>
+          <div class="tiny muted">Локально на устройстве</div>
+        </div>
+
+        <div class="summary-grid progress-grid">
+          <div class="card info-card compact">
+            <div class="stat-title">Активных дней</div>
+            <div id="activeDaysValue" class="big-stat">0</div>
+          </div>
+          <div class="card info-card compact">
+            <div class="stat-title">Лучший стрик</div>
+            <div id="bestStreakValue" class="big-stat">0</div>
+          </div>
+          <div class="card info-card compact">
+            <div class="stat-title">Последний комплекс</div>
+            <div id="lastComplexValue" class="big-stat small-text">—</div>
+          </div>
+          <div class="card info-card compact">
+            <div class="stat-title">Последняя дата</div>
+            <div id="lastDateValue" class="big-stat small-text">—</div>
+          </div>
+        </div>
+
+        <div class="card info-card">
+          <div class="section-title">Календарь последних 30 дней</div>
+          <div id="calendarGrid" class="calendar-grid"></div>
+        </div>
+
+        <div class="card info-card">
+          <div class="section-title">Резервная копия</div>
+          <div class="button-row">
+            <button id="exportBtn" class="secondary-btn">Экспортировать данные</button>
+            <label class="secondary-btn file-label">
+              Импортировать
+              <input id="importInput" type="file" accept="application/json" hidden />
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section id="screen-info" class="screen">
+        <div class="section-header">
+          <h2>Инфо</h2>
+          <div class="tiny muted">О производственной гимнастике</div>
+        </div>
+
+        <div class="card brand-card">
+          <div class="brand-card-logo">
+            <img src="assets/brand/logo-gtt-blue.png" alt="Газпром трансгаз Томск" />
+          </div>
+          <div>
+            <div class="section-title">Производственная гимнастика</div>
+            <p class="muted info-lead">Краткая справка, цели, задачи, требования безопасности и ожидаемый эффект.</p>
+          </div>
+        </div>
+
+        <div class="card info-topic-card">
+          <div class="info-topic-title"><span>ℹ️</span> Что это такое</div>
+          <p>Производственная гимнастика представляет собой комплекс простых физических упражнений, выполняемых в рабочее время с целью профилактики утомления, поддержания работоспособности и формирования привычки к регулярной двигательной активности.</p>
+        </div>
+
+        <div class="card info-topic-card">
+          <div class="info-topic-title"><span>🎯</span> Цель</div>
+          <p>Снижение утомления работников, повышение работоспособности, профилактика статического мышечного напряжения и укрепление здоровья работников.</p>
+        </div>
+
+        <div class="card info-topic-card">
+          <div class="info-topic-title"><span>✅</span> Основные задачи</div>
+          <ul class="clean-list info-list">
+            <li>активизация кровообращения;</li>
+            <li>снятие напряжения в мышцах шеи, плечевого пояса и спины;</li>
+            <li>переключение внимания и восстановление работоспособности;</li>
+            <li>повышение двигательной активности работников.</li>
+          </ul>
+        </div>
+
+        <div class="card info-topic-card safety-card">
+          <div class="info-topic-title"><span>🛡️</span> Требования безопасности</div>
+          <ul class="clean-list info-list">
+            <li>выполнять упражнения в комфортном темпе;</li>
+            <li>не допускать резких движений и болевых ощущений;</li>
+            <li>при ухудшении самочувствия прекратить выполнение упражнений.</li>
+          </ul>
+        </div>
+
+        <div class="card info-topic-card effect-card">
+          <div class="info-topic-title"><span>✨</span> Ожидаемый эффект</div>
+          <p>Снижение утомляемости, улучшение самочувствия, повышение концентрации внимания и формирование культуры здорового образа жизни на рабочем месте.</p>
+        </div>
+
+        <div class="card info-topic-card contact-card">
+          <div class="info-topic-title"><span>📩</span> Контакты</div>
+          <p>С вопросами и предложениями обращаться к инструктору по ФК <strong>Пакулину Сергею</strong>.</p>
+        </div>
+      </section>
+
+      <section id="screen-settings" class="screen">
+        <div class="section-header">
+          <h2>Настройки</h2>
+          <div class="tiny muted">Всё на русском языке</div>
+        </div>
+
+        <div class="card settings-card">
+          <div class="settings-row">
+            <div>
+              <div class="setting-title">Фоновая музыка</div>
+              <div class="tiny muted">Спокойный фоновый звук во время упражнений</div>
+            </div>
+            <label class="switch">
+              <input id="musicToggle" type="checkbox" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="settings-row">
+            <div>
+              <div class="setting-title">Голосовые подсказки</div>
+              <div class="tiny muted">Озвучивает название и инструкцию упражнения</div>
+            </div>
+            <label class="switch">
+              <input id="voiceToggle" type="checkbox" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="settings-row">
+            <div>
+              <div class="setting-title">Автоозвучка</div>
+              <div class="tiny muted">Начинать диктовку сразу после открытия упражнения</div>
+            </div>
+            <label class="switch">
+              <input id="autoVoiceToggle" type="checkbox" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="card settings-card">
+          <div class="setting-title">Длительность упражнения по умолчанию</div>
+          <div class="duration-selector" id="durationSelector">
+            <button class="duration-pill" data-duration-mode="short">35–45 сек</button>
+            <button class="duration-pill active" data-duration-mode="normal">45–60 сек</button>
+            <button class="duration-pill" data-duration-mode="long">60–75 сек</button>
+          </div>
+        </div>
+
+        <div class="card settings-card install-settings-card">
+          <div class="setting-title">Установка приложения</div>
+          <div id="installHint" class="tiny muted" style="margin-top:8px;">Если браузер поддерживает установку PWA, ниже появится кнопка установки.</div>
+          <div class="button-row" style="margin-top:12px;">
+            <button id="installBtn" class="secondary-btn hidden">Установить приложение</button>
+          </div>
+        </div>
+
+        <div class="card settings-card">
+          <div class="button-row stack">
+            <button id="resetDayBtn" class="secondary-btn">Сбросить отметку за сегодня</button>
+            <button id="resetAllBtn" class="danger-btn">Полный сброс прогресса</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav glass">
+      <button class="nav-btn active" data-screen="home"><span>🏠</span><small>Главная</small></button>
+      <button class="nav-btn" data-screen="complexes"><span>🧩</span><small>Комплексы</small></button>
+      <button class="nav-btn" data-screen="progress"><span>📈</span><small>Прогресс</small></button>
+      <button class="nav-btn" data-screen="info"><span>ℹ️</span><small>Инфо</small></button>
+      <button class="nav-btn" data-screen="settings"><span>⚙️</span><small>Настройки</small></button>
+    </nav>
+  </div>
+
+  <div id="complexModal" class="modal-shell hidden" aria-hidden="true">
+    <div class="modal-backdrop" data-close-modal="complex"></div>
+    <div class="modal-panel bottom-sheet">
+      <div class="sheet-handle"></div>
+      <button class="close-btn" data-close-modal="complex">✕</button>
+      <div id="complexModalContent"></div>
+    </div>
+  </div>
+
+  <div id="exerciseModal" class="modal-shell hidden" aria-hidden="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-panel exercise-sheet">
+      <div class="pulse-ring"></div>
+      <button class="close-btn" id="exerciseCloseBtn">✕</button>
+      <div id="exerciseModalContent"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
