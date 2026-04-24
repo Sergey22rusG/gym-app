@@ -34,11 +34,11 @@
         <div class="hero-card card gradient-card">
           <div class="hero-avatar-wrap">
             <div id="avatarHero" class="hero-avatar male">🧑‍💼</div>
-            <button id="avatarToggleBtn" class="ghost-btn small">Сменить персонажа</button>
+            <button id="avatarToggleBtn" class="ghost-btn small">Выбрать аватар</button>
           </div>
           <div class="hero-stats">
-            <div class="eyebrow light">Ваш ежедневный ритуал</div>
-            <h2 id="welcomeText">Добро пожаловать!</h2>
+            <div class="eyebrow light">Сделай паузу для здоровья</div>
+            <button id="heroActionBtn" class="ghost-btn hero-action-btn" data-nav="complexes">Перейти к комплексам</button>
             <p class="muted light">7–10 минут в день. Один полный комплекс = один активный день прогресса.</p>
             <div class="chip-row">
               <div class="stat-chip">
@@ -78,14 +78,6 @@
           <button class="primary-btn" data-nav="complexes">Перейти к комплексам</button>
         </div>
 
-        <div class="card info-shortcut-card">
-          <div>
-            <div class="stat-title">О производственной гимнастике</div>
-            <p class="muted">Цель, задачи, требования безопасности и ожидаемый эффект — в отдельном блоке «Инфо».</p>
-          </div>
-          <button class="secondary-btn" data-nav="info">Открыть инфо</button>
-        </div>
-
         <div class="card info-card">
           <div class="section-title">Как это работает</div>
           <ul class="clean-list">
@@ -117,7 +109,7 @@
             <div id="activeDaysValue" class="big-stat">0</div>
           </div>
           <div class="card info-card compact">
-            <div class="stat-title">Лучший стрик</div>
+            <div class="stat-title">Рекорд серии</div>
             <div id="bestStreakValue" class="big-stat">0</div>
           </div>
           <div class="card info-card compact">
@@ -209,17 +201,51 @@
           <div class="tiny muted">Всё на русском языке</div>
         </div>
 
+        
         <div class="card settings-card">
           <div class="settings-row">
             <div>
               <div class="setting-title">Фоновая музыка</div>
-              <div class="tiny muted">Спокойный фоновый звук во время упражнений</div>
+              <div class="tiny muted">Можно выбрать один из двух вариантов или загрузить свою мелодию</div>
             </div>
             <label class="switch">
               <input id="musicToggle" type="checkbox" />
               <span class="slider"></span>
             </label>
           </div>
+
+          <div class="settings-block">
+            <div class="setting-title">Выбор мелодии</div>
+            <div class="tiny muted">Вариант 1, вариант 2 или своя мелодия</div>
+            <div class="melody-selector" id="melodySelector">
+              <button class="melody-pill" data-music-preset="preset1">Вариант 1</button>
+              <button class="melody-pill" data-music-preset="preset2">Вариант 2</button>
+              <button class="melody-pill" data-music-preset="custom">Своя мелодия</button>
+            </div>
+          </div>
+
+          <div class="settings-block">
+            <label class="range-label" for="musicVolumeInput">
+              <span>Громкость фоновой музыки</span>
+              <strong id="musicVolumeValue">45%</strong>
+            </label>
+            <input id="musicVolumeInput" class="range-input" type="range" min="0" max="100" step="5" />
+            <div class="tiny muted" style="margin-top:8px;">При движении ползунка выбранная мелодия проигрывается сразу, чтобы можно было подобрать комфортную громкость.</div>
+          </div>
+
+          <div class="custom-upload-card" id="customMelodyWrap">
+            <div class="setting-title">Своя фоновая мелодия</div>
+            <div class="tiny muted">Можно загрузить MP3, WAV или M4A. Для стабильной работы лучше короткий файл до 2 МБ.</div>
+            <div class="button-row" style="margin-top:10px;">
+              <label class="secondary-btn file-label">
+                Загрузить свою мелодию
+                <input id="customMelodyInput" type="file" accept="audio/*" hidden />
+              </label>
+              <button id="clearCustomMelodyBtn" class="secondary-btn hidden">Убрать свою мелодию</button>
+            </div>
+            <div id="customMelodyName" class="tiny muted" style="margin-top:10px;">Сейчас используется мелодия по умолчанию.</div>
+          </div>
+
           <div class="settings-row">
             <div>
               <div class="setting-title">Голосовые подсказки</div>
@@ -240,6 +266,23 @@
               <span class="slider"></span>
             </label>
           </div>
+        </div>
+
+        <details class="card settings-card settings-details-card">
+          <summary class="settings-summary">Как считается прогресс</summary>
+          <div class="settings-details-content">
+            <p><strong>Активные дни</strong> — это дни, в которые вы полностью завершили хотя бы один комплекс упражнений.</p>
+            <p><strong>Рекорд серии</strong> — это максимальное количество дней подряд без пропусков, когда вы завершали комплекс.</p>
+            <p><strong>Репутация</strong> увеличивается за каждый полностью завершённый комплекс.</p>
+            <p><strong>Звёзды</strong> начисляются за завершённые комплексы и помогают видеть общий прогресс.</p>
+            <p>Если между активными днями есть пропуск, серия дней подряд начинается заново.</p>
+          </div>
+        </details>
+
+<div class="card settings-card" id="avatarSettingsCard">
+          <div class="setting-title">Аватар героя</div>
+          <div class="tiny muted">Выберите образ, который будет отображаться на главном экране.</div>
+          <div id="avatarPresetGrid" class="avatar-grid"></div>
         </div>
 
         <div class="card settings-card">

@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'gymAppState_v8';
+const STORAGE_KEY = 'gymAppState_v14';
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
 const COMPLEXES = [
@@ -64,6 +64,22 @@ const COMPLEXES = [
   }
 ];
 
+
+const PRESET_AVATARS = [
+  { id: 'hero', emoji: '🧑‍💼', label: 'Герой' },
+  { id: 'heroine', emoji: '👩‍💼', label: 'Героиня' },
+  { id: 'boss', emoji: '🕴️', label: 'БОСС', className: 'boss' },
+  { id: 'robot', emoji: '🤖', label: 'РОБОТ' },
+  { id: 'crown', emoji: '👑', label: 'Корона' },
+  { id: 'cool', emoji: '😎', label: 'Свой парень' },
+  { id: 'nerd', emoji: '🤓', label: 'Умник' },
+  { id: 'superhero', emoji: '🦸', label: 'Супер герой' },
+  { id: 'wand', emoji: '🪄', label: 'Палочка-выручалочка' }
+];
+
+const DEFAULT_MUSIC_SRC = 'assets/audio/default-background.mp3';
+const ALT_MUSIC_SRC = 'assets/audio/alt-background.mp3';
+
 const durationModes = {
   short: 0.8,
   normal: 1,
@@ -71,8 +87,8 @@ const durationModes = {
 };
 
 const defaultState = () => ({
-  profile: { avatar: 'male' },
-  settings: { music: false, voice: true, autoVoice: true, durationMode: 'normal' },
+  profile: { avatar: 'hero' },
+  settings: { music: true, musicVolume: 45, musicPreset: 'preset1', customMusicData: null, customMusicName: '', voice: true, autoVoice: true, durationMode: 'normal' },
   progress: {
     reputation: 0,
     stars: 0,
@@ -185,6 +201,11 @@ function bindEvents() {
   document.querySelectorAll('[data-nav="info"]').forEach((btn) => btn.addEventListener('click', () => switchScreen('info')));
   document.getElementById('infoBtn').addEventListener('click', () => switchScreen('info'));
   document.getElementById('avatarToggleBtn').addEventListener('click', toggleAvatar);
+  document.querySelectorAll('[data-music-preset]').forEach((btn) => btn.addEventListener('click', () => setMusicPreset(btn.dataset.musicPreset)));
+  document.getElementById('musicVolumeInput').addEventListener('input', onMusicVolumeChange);
+  document.getElementById('musicVolumeInput').addEventListener('change', onMusicVolumeChange);
+  document.getElementById('customMelodyInput').addEventListener('change', onCustomMelodyUpload);
+  document.getElementById('clearCustomMelodyBtn').addEventListener('click', clearCustomMelody);
   document.getElementById('musicToggle').addEventListener('change', onMusicToggle);
   document.getElementById('voiceToggle').addEventListener('change', (e) => {
     state.settings.voice = e.target.checked;
@@ -238,25 +259,24 @@ function switchScreen(screen) {
 }
 
 function toggleAvatar() {
-  state.profile.avatar = state.profile.avatar === 'male' ? 'female' : 'male';
-  saveState();
-  renderAll();
+  switchScreen('settings');
+  document.getElementById('avatarSettingsCard')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function restoreAudioSettings() {
   document.getElementById('musicToggle').checked = !!state.settings.music;
   document.getElementById('voiceToggle').checked = !!state.settings.voice;
   document.getElementById('autoVoiceToggle').checked = !!state.settings.autoVoice;
+  document.getElementById('musicVolumeInput').value = state.settings.musicVolume ?? 45;
+  document.getElementById('musicVolumeValue').textContent = `${state.settings.musicVolume ?? 45}%`;
 }
 
 
 function renderAll() {
-  const avatarEl = document.getElementById('avatarHero');
-  const isFemale = state.profile.avatar === 'female';
-  avatarEl.textContent = isFemale ? '👩‍💼' : '🧑‍💼';
-  avatarEl.className = `hero-avatar ${isFemale ? 'female' : 'male'}`;
+  renderHeroAvatar();
+  renderAvatarOptions();
+  renderMusicSettings();
 
-  document.getElementById('welcomeText').textContent = isFemale ? 'Героиня дня готова!' : 'Герой дня готов!';
   document.getElementById('streakValue').textContent = state.progress.streak;
   document.getElementById('starsValue').textContent = state.progress.stars;
   document.getElementById('levelValue').textContent = state.progress.level;
@@ -264,6 +284,8 @@ function renderAll() {
   document.getElementById('complexCountValue').textContent = state.progress.completedComplexCount;
   document.getElementById('activeDaysValue').textContent = state.progress.activeDays;
   document.getElementById('bestStreakValue').textContent = state.progress.bestStreak;
+  document.getElementById('musicVolumeInput').value = state.settings.musicVolume ?? 45;
+  document.getElementById('musicVolumeValue').textContent = `${state.settings.musicVolume ?? 45}%`;
   document.getElementById('lastComplexValue').textContent = state.progress.lastCompletedComplexName || '—';
   document.getElementById('lastDateValue').textContent = state.progress.lastActiveDate ? formatDateShort(state.progress.lastActiveDate) : '—';
   document.getElementById('todayStatus').textContent = hasCompletedToday()
@@ -279,6 +301,93 @@ function renderAll() {
 
   renderCalendar();
   renderComplexes();
+}
+
+
+function renderHeroAvatar() {
+  const avatarEl = document.getElementById('avatarHero');
+  const avatar = PRESET_AVATARS.find((item) => item.id === state.profile.avatar) || PRESET_AVATARS[0];
+  avatarEl.textContent = avatar.emoji;
+  avatarEl.className = `hero-avatar ${avatar.className || avatar.id}`;
+}
+
+function renderAvatarOptions() {
+  const grid = document.getElementById('avatarPresetGrid');
+  if (!grid) return;
+  grid.innerHTML = PRESET_AVATARS.map((item) => `
+    <button class="avatar-option ${state.profile.avatar === item.id ? 'active' : ''}" data-avatar-id="${item.id}">
+      <div class="avatar-option-emoji">${item.emoji}</div>
+      <div class="avatar-option-label">${item.label}</div>
+    </button>
+  `).join('');
+  grid.querySelectorAll('[data-avatar-id]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.profile.avatar = btn.dataset.avatarId;
+      saveState();
+      renderAll();
+    });
+  });
+}
+
+function renderMusicSettings() {
+  const nameEl = document.getElementById('customMelodyName');
+  const clearBtn = document.getElementById('clearCustomMelodyBtn');
+  const customWrap = document.getElementById('customMelodyWrap');
+  document.querySelectorAll('[data-music-preset]').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.musicPreset === (state.settings.musicPreset || 'preset1'));
+  });
+  if (!nameEl || !clearBtn || !customWrap) return;
+  const preset = state.settings.musicPreset || 'preset1';
+  if (preset === 'custom') {
+    customWrap.classList.remove('hidden');
+    if (state.settings.customMusicData) {
+      nameEl.textContent = `Сейчас используется: ${state.settings.customMusicName || 'своя мелодия'}`;
+      clearBtn.classList.remove('hidden');
+    } else {
+      nameEl.textContent = 'Сначала загрузите свою мелодию.';
+      clearBtn.classList.add('hidden');
+    }
+  } else {
+    customWrap.classList.add('hidden');
+    const labels = { preset1: 'Сейчас используется Вариант 1.', preset2: 'Сейчас используется Вариант 2.' };
+    nameEl.textContent = labels[preset] || 'Сейчас используется мелодия по умолчанию.';
+    clearBtn.classList.add('hidden');
+  }
+}
+
+
+
+function setMusicPreset(preset) {
+  state.settings.musicPreset = preset;
+  saveState();
+  renderMusicSettings();
+  previewSelectedMusic();
+}
+
+function getSelectedMusicSrc() {
+  const preset = state.settings.musicPreset || 'preset1';
+  if (preset === 'preset2') return ALT_MUSIC_SRC;
+  if (preset === 'custom') return state.settings.customMusicData || DEFAULT_MUSIC_SRC;
+  return DEFAULT_MUSIC_SRC;
+}
+
+function isExerciseFlowOpen() {
+  const complexOpen = !document.getElementById('complexModal').classList.contains('hidden');
+  const exerciseOpen = !document.getElementById('exerciseModal').classList.contains('hidden');
+  return complexOpen || exerciseOpen;
+}
+
+let musicPreviewTimer = null;
+
+function previewSelectedMusic() {
+  clearTimeout(musicPreviewTimer);
+  const wasEnabled = state.settings.music;
+  state.settings.music = true;
+  startAmbientMusic();
+  state.settings.music = wasEnabled;
+  musicPreviewTimer = setTimeout(() => {
+    if (!isExerciseFlowOpen()) stopAmbientMusic();
+  }, 1600);
 }
 
 function formatDateShort(iso) {
@@ -352,11 +461,13 @@ function openComplex(id) {
   });
   modal.classList.remove('hidden');
   modal.setAttribute('aria-hidden', 'false');
+  if (state.settings.music) startAmbientMusic();
 }
 
 function closeComplexModal() {
   document.getElementById('complexModal').classList.add('hidden');
   document.getElementById('complexModal').setAttribute('aria-hidden', 'true');
+  stopAmbientMusic();
 }
 
 function getExercisesDoneForDay(complexId, dayISO) {
@@ -503,7 +614,6 @@ function restartExercise() {
     pauseBtn.textContent = 'Пауза';
   }
   if (restartBtn) restartBtn.disabled = true;
-  stopAmbientMusic();
   updateTimerUI(exerciseTimeLeft, activeExercise.total, 'Таймер сброшен. Нажмите «Старт», когда будете готовы.');
 }
 
@@ -516,7 +626,6 @@ function cancelExercise() {
 }
 
 function closeExerciseModal() {
-  stopAmbientMusic();
   document.getElementById('exerciseModal').classList.add('hidden');
   document.getElementById('exerciseModal').setAttribute('aria-hidden', 'true');
   clearInterval(exerciseTimerId);
@@ -622,9 +731,62 @@ function resetTodayMark() {
 function onMusicToggle(e) {
   state.settings.music = e.target.checked;
   saveState();
-  if (state.settings.music) startAmbientMusic();
-  else stopAmbientMusic();
+  if (state.settings.music && currentComplexId && !document.getElementById('complexModal').classList.contains('hidden')) {
+    startAmbientMusic();
+  } else {
+    stopAmbientMusic();
+  }
 }
+
+function onMusicVolumeChange(e) {
+  state.settings.musicVolume = Number(e.target.value);
+  document.getElementById('musicVolumeValue').textContent = `${state.settings.musicVolume}%`;
+  saveState();
+  if (ambientEngine?.audio) {
+    ambientEngine.audio.volume = Math.max(0, Math.min(1, state.settings.musicVolume / 100));
+  }
+  previewSelectedMusic();
+}
+
+
+function onCustomMelodyUpload(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  if (!file.type.startsWith('audio/')) {
+    showToast('Выберите аудиофайл.');
+    event.target.value = '';
+    return;
+  }
+  if (file.size > 2 * 1024 * 1024) {
+    showToast('Файл слишком большой. Лучше до 2 МБ.');
+    event.target.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    state.settings.customMusicData = reader.result;
+    state.settings.customMusicName = file.name;
+    state.settings.musicPreset = 'custom';
+    saveState();
+    renderMusicSettings();
+    previewSelectedMusic();
+    showToast('Своя мелодия загружена.');
+  };
+  reader.onerror = () => showToast('Не удалось загрузить мелодию.');
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
+function clearCustomMelody() {
+  state.settings.customMusicData = null;
+  state.settings.customMusicName = '';
+  if (state.settings.musicPreset === 'custom') state.settings.musicPreset = 'preset1';
+  saveState();
+  renderMusicSettings();
+  previewSelectedMusic();
+  showToast('Возвращена предустановленная мелодия.');
+}
+
 
 function ensureAudioContext() {
   if (!audioContext) {
@@ -656,35 +818,30 @@ function playBell(type) {
 }
 
 function startAmbientMusic() {
-  const ctx = ensureAudioContext();
-  if (!ctx || ambientEngine) return;
-  ambientEngine = { timers: [] };
-  const notes = [261.63, 329.63, 392.0, 329.63];
-  let step = 0;
-  const loop = () => {
-    if (!ambientEngine) return;
-    const now = ctx.currentTime;
-    const freq = notes[step % notes.length];
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'triangle';
-    osc.frequency.value = freq;
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(0.028, now + 0.3);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.9);
-    osc.connect(gain).connect(ctx.destination);
-    osc.start(now);
-    osc.stop(now + 2.0);
-    step += 1;
-    const timer = setTimeout(loop, 1800);
-    ambientEngine.timers.push(timer);
-  };
-  loop();
+  if (!state.settings.music) return;
+  const src = getSelectedMusicSrc();
+  const volume = Math.max(0, Math.min(1, (state.settings.musicVolume ?? 45) / 100));
+  if (ambientEngine?.audio && ambientEngine.src === src) {
+    ambientEngine.audio.volume = volume;
+    ambientEngine.audio.play().catch(() => null);
+    return;
+  }
+  stopAmbientMusic();
+  const audio = new Audio(src);
+  audio.loop = true;
+  audio.volume = volume;
+  audio.play().catch(() => null);
+  ambientEngine = { type: 'audio', audio, src };
 }
 
 function stopAmbientMusic() {
+  clearTimeout(musicPreviewTimer);
   if (!ambientEngine) return;
-  ambientEngine.timers.forEach(clearTimeout);
+  if (ambientEngine.audio) {
+    ambientEngine.audio.pause();
+    ambientEngine.audio.currentTime = 0;
+  }
+  if (ambientEngine.timers) ambientEngine.timers.forEach(clearTimeout);
   ambientEngine = null;
 }
 
@@ -700,9 +857,15 @@ function speakText(text) {
   utterance.rate = 0.96;
   utterance.pitch = 1;
   const voices = window.speechSynthesis.getVoices();
-  const ruVoice = voices.find((v) => v.lang?.toLowerCase().startsWith('ru'));
+  const ruVoice = chooseFemaleRussianVoice(voices);
   if (ruVoice) utterance.voice = ruVoice;
+  utterance.pitch = 1.08;
   window.speechSynthesis.speak(utterance);
+}
+function chooseFemaleRussianVoice(voices) {
+  const ruVoices = voices.filter((v) => v.lang?.toLowerCase().startsWith('ru'));
+  const femaleHints = ['female', 'жен', 'alena', 'алена', 'irina', 'ирина', 'milena', 'милена', 'katya', 'катя', 'oksana', 'оксана', 'yandex'];
+  return ruVoices.find((v) => femaleHints.some((hint) => v.name?.toLowerCase().includes(hint))) || ruVoices[0] || voices[0];
 }
 window.speechSynthesis?.addEventListener?.('voiceschanged', () => {});
 

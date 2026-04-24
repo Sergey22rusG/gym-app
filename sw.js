@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gym-offline-v8';
+const CACHE_NAME = 'gym-offline-v14b';
 const ASSETS = [
   './',
   './index.html',
@@ -36,7 +36,9 @@ const ASSETS = [
   './assets/icons/icon-180.png',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
-  './assets/brand/logo-gtt-blue.png'
+  './assets/brand/logo-gtt-blue.png',
+  './assets/audio/default-background.mp3',
+  './assets/audio/alt-background.mp3'
 ];
 
 self.addEventListener('install', (event) => {
