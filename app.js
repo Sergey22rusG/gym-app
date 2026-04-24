@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'gymAppState_v14';
+const STORAGE_KEY = 'gymAppState_v16';
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
 const COMPLEXES = [
@@ -65,19 +65,44 @@ const COMPLEXES = [
 ];
 
 
-const PRESET_AVATARS = [
-  { id: 'hero', emoji: '🧑‍💼', label: 'Герой' },
-  { id: 'heroine', emoji: '👩‍💼', label: 'Героиня' },
-  { id: 'boss', emoji: '🕴️', label: 'БОСС', className: 'boss' },
-  { id: 'robot', emoji: '🤖', label: 'РОБОТ' },
-  { id: 'crown', emoji: '👑', label: 'Корона' },
-  { id: 'cool', emoji: '😎', label: 'Свой парень' },
-  { id: 'nerd', emoji: '🤓', label: 'Умник' },
-  { id: 'superhero', emoji: '🦸', label: 'Супер герой' },
-  { id: 'wand', emoji: '🪄', label: 'Палочка-выручалочка' }
+
+const STATUSS = [
+  { min: 0, max: 3, name: 'Новичок', male: 'assets/status/male_1.png', female: 'assets/status/female_1.png', next: 4 },
+  { min: 4, max: 6, name: 'Набираю обороты', male: 'assets/status/male_2.png', female: 'assets/status/female_2.png', next: 7 },
+  { min: 7, max: 9, name: 'Бодрячком!', male: 'assets/status/male_3.png', female: 'assets/status/female_3.png', next: 10 },
+  { min: 10, max: 13, name: 'В отличной форме', male: 'assets/status/male_4.png', female: 'assets/status/female_4.png', next: 14 },
+  { min: 14, max: Infinity, name: 'Гуру гимнастики', male: 'assets/status/male_5.png', female: 'assets/status/female_5.png', next: null },
 ];
 
+const EXERCISE_SPEECH = {
+  'complex1_1': 'Упражнение 1. Повороты головы́. Сидя на стуле, плавно поворачивайте голову вправо и влево. Повторите по четыре раза в каждую сторону.',
+  'complex1_2': 'Упражнение 2. Круговые движения плечами. Стоя, выполняйте круговые движения плечами вперёд и назад. Повторите по восемь раз.',
+  'complex1_3': 'Упражнение 3. Повороты корпу́са. Сидя на стуле, руки на поясе, плавно поворачивайте корпус вправо и влево. Повторите по четыре раза в каждую сторону.',
+  'complex1_4': 'Упражнение 4. Наклоны в стороны. Стоя, руки на поясе, выполняйте наклоны корпуса вправо и влево. Повторите по шесть раз в каждую сторону.',
+  'complex1_5': 'Упражнение 5. Разгибание ноги. Сидя на стуле, поочерёдно выпрямляйте ногу вперёд. Повторите по шесть раз на каждую ногу.',
+  'complex1_6': 'Упражнение 6. Подъём на носки́. Стоя, поднимайтесь на носки́ и плавно опускайтесь. Повторите десять раз.',
+  'complex2_1': 'Упражнение 1. Наклоны головы́ вперёд и назад. Сидя на стуле, наклоните голову вперёд, затем слегка назад. Повторите по четыре раза.',
+  'complex2_2': 'Упражнение 2. Подъём рук вверх. Стоя, поднимите обе руки вверх, потянитесь, затем опустите руки вниз. Повторите шесть раз.',
+  'complex2_3': 'Упражнение 3. Сведение лопаток. Сидя на стуле, руки на поясе или вдоль тела. Отведите плечи назад, сведите лопатки. Повторите восемь раз.',
+  'complex2_4': 'Упражнение 4. Полуприседания. Стоя, ноги на ширине плеч, руки вперёд. Выполните комфортные полуприседания. Повторите восемь раз.',
+  'complex2_5': 'Упражнение 5. Перекаты стоп. Сидя на стуле, попеременно поднимайте носки́ вверх, затем пятки. Повторите восемь раз.',
+  'complex2_6': 'Упражнение 6. Шаг на месте. Идите на месте, умеренно поднимая коле́ни. Повторите по десять раз на каждую ногу.',
+  'complex3_1': 'Упражнение 1. Наклоны головы́ в стороны. Сидя на стуле, плавно наклоняйте голову вправо и влево. Повторите по четыре раза в каждую сторону.',
+  'complex3_2': 'Упражнение 2. Махи руками. Стоя, выполняйте махи прямыми руками вперёд и назад в комфортной амплитуде. Повторите восемь раз.',
+  'complex3_3': 'Упражнение 3. Прогиб и округление спины. Сидя на стуле, плавно прогибайте спину, раскрывая грудь, затем округляйте её. Повторите шесть раз.',
+  'complex3_4': 'Упражнение 4. Повороты корпу́са. Стоя, руки на поясе, плавно поворачивайте корпус вправо и влево. Повторите по шесть раз в каждую сторону.',
+  'complex3_5': 'Упражнение 5. Круговые движения стопо́й. Сидя на стуле, поочерёдно выполняйте круговые движения одной стопо́й в голеносто́пе, затем другой. Повторите по восемь раз.',
+  'complex3_6': 'Упражнение 6. Подъём коле́ней. Стоя, поочерёдно поднимайте коле́ни вверх на месте. Повторите по десять раз на каждую ногу.',
+  'complex4_1': 'Упражнение 1. Наклоны в стороны сидя. Сидя на стуле, одна рука на поясе, другая поднята вверх. Наклоняйтесь вправо и влево. Повторите по четыре раза.',
+  'complex4_2': 'Упражнение 2. Сгибание рук. Стоя, сгибайте и разгибайте руки в локтях. Повторите десять раз.',
+  'complex4_3': 'Упражнение 3. Наклон вперёд сидя. Сидя на стуле, скользите руками к коле́ням, делая мягкий наклон вперёд, затем вернитесь. Повторите шесть раз.',
+  'complex4_4': 'Упражнение 4. Отведение ноги назад. Стоя, руки на поясе, поочерёдно отводите прямую ногу назад. Повторите по шесть раз на каждую ногу.',
+  'complex4_5': 'Упражнение 5. Вращение кистями. Сидя на стуле, руки вытянуты вперёд. Вращайте кистями по кругу в одну и другую сторону. Повторите по десять раз.',
+  'complex4_6': 'Упражнение 6. Потягивание вверх. Стоя, поднимите обе руки вверх, потянитесь всем телом вверх и вернитесь. Повторите шесть раз.',
+};
+
 const DEFAULT_MUSIC_SRC = 'assets/audio/default-background.mp3';
+
 const ALT_MUSIC_SRC = 'assets/audio/alt-background.mp3';
 
 const durationModes = {
@@ -87,7 +112,7 @@ const durationModes = {
 };
 
 const defaultState = () => ({
-  profile: { avatar: 'hero' },
+  profile: { gender: 'male' },
   settings: { music: true, musicVolume: 45, musicPreset: 'preset1', customMusicData: null, customMusicName: '', voice: true, autoVoice: true, durationMode: 'normal' },
   progress: {
     reputation: 0,
@@ -101,6 +126,9 @@ const defaultState = () => ({
     lastCompletedComplexName: null,
     completedDays: {},
     completedExercisesByDay: {},
+    statusScore: 0,
+    inactivityStreak: 0,
+    processedThroughDate: null,
   }
 });
 
@@ -143,17 +171,7 @@ function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
-function ensureDecay() {
-  const last = state.progress.lastActiveDate;
-  if (!last) return;
-  const diff = dayDiff(last, todayISO());
-  if (diff <= 1) return;
-  const missed = diff - 1;
-  state.progress.streak = 0;
-  state.progress.stars = Math.max(0, state.progress.stars - Math.min(3, missed));
-  state.progress.reputation = Math.max(0, state.progress.reputation - missed * 2);
-  saveState();
-}
+function ensureDecay() { recomputeProgress(); }
 
 function dayDiff(fromISO, toISO) {
   const a = new Date(fromISO + 'T00:00:00');
@@ -168,6 +186,114 @@ function computeLevel(reputation) {
 function calculateExerciseDuration(base) {
   const mode = state.settings.durationMode || 'normal';
   return Math.max(20, Math.round(base * (durationModes[mode] || 1)));
+}
+
+
+function getStatusByScore(score) {
+  return STATUSS.find((status) => score >= status.min && score <= status.max) || STATUSS[0];
+}
+
+function getStatusIndexByScore(score) {
+  return STATUSS.findIndex((status) => score >= status.min && score <= status.max);
+}
+
+function getNextStatusHint(score) {
+  const status = getStatusByScore(score);
+  if (!status.next) return 'Максимальный статус достигнут';
+  const left = Math.max(0, status.next - score);
+  const word = left === 1 ? 'день' : (left >= 2 && left <= 4 ? 'дня' : 'дней');
+  return `До следующего статуса: ещё ${left} активных ${word}`;
+}
+
+function downgradeStatusScore(score) {
+  const idx = getStatusIndexByScore(score);
+  if (idx <= 0) return 0;
+  return STATUSS[idx - 1].min;
+}
+
+function getStatusAvatarSrc(gender, score) {
+  const status = getStatusByScore(score);
+  return gender === 'female' ? status.female : status.male;
+}
+
+function eachDateInclusive(startISO, endISO) {
+  const out = [];
+  let current = new Date(startISO + 'T00:00:00');
+  const end = new Date(endISO + 'T00:00:00');
+  while (current <= end) {
+    out.push(current.toISOString().slice(0, 10));
+    current.setDate(current.getDate() + 1);
+  }
+  return out;
+}
+
+function getLastCompletedComplexName(dayISO) {
+  const list = state.progress.completedDays?.[dayISO] || [];
+  const lastId = list[list.length - 1];
+  return COMPLEXES.find((c) => c.id === lastId)?.title || '—';
+}
+
+function recomputeProgress() {
+  const p = state.progress;
+  const dayMap = p.completedDays || {};
+  const activeDates = Object.keys(dayMap).filter((day) => Array.isArray(dayMap[day]) && dayMap[day].length > 0).sort();
+  p.activeDays = activeDates.length;
+  p.completedComplexCount = activeDates.reduce((sum, day) => sum + dayMap[day].length, 0);
+  p.reputation = p.completedComplexCount * 10;
+  p.stars = p.completedComplexCount;
+  p.lastActiveDate = activeDates.length ? activeDates[activeDates.length - 1] : null;
+  p.lastCompletedComplexName = p.lastActiveDate ? getLastCompletedComplexName(p.lastActiveDate) : null;
+
+  let bestStreak = 0;
+  let running = 0;
+  let prevDay = null;
+  activeDates.forEach((day) => {
+    if (prevDay && dayDiff(prevDay, day) === 1) running += 1;
+    else running = 1;
+    bestStreak = Math.max(bestStreak, running);
+    prevDay = day;
+  });
+  p.bestStreak = bestStreak;
+  if (!p.lastActiveDate) {
+    p.streak = 0;
+  } else {
+    const gap = dayDiff(p.lastActiveDate, todayISO());
+    p.streak = gap <= 1 ? running : 0;
+  }
+
+  let statusScore = 0;
+  let inactivity = 0;
+  if (activeDates.length) {
+    const firstDay = activeDates[0];
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayISO = yesterday.toISOString().slice(0, 10);
+    if (firstDay <= yesterdayISO) {
+      eachDateInclusive(firstDay, yesterdayISO).forEach((day) => {
+        if ((dayMap[day] || []).length > 0) {
+          statusScore += 1;
+          inactivity = 0;
+        } else {
+          inactivity += 1;
+          while (inactivity >= 3) {
+            statusScore = downgradeStatusScore(statusScore);
+            inactivity -= 3;
+          }
+        }
+      });
+    }
+    if ((dayMap[todayISO()] || []).length > 0) {
+      statusScore += 1;
+      inactivity = 0;
+    }
+  }
+  p.statusScore = statusScore;
+  p.inactivityStreak = inactivity;
+  p.processedThroughDate = todayISO();
+}
+
+function getExerciseSpeechText(exercise) {
+  return EXERCISE_SPEECH[`${exercise.complexId}_${exercise.no}`] || `Упражнение ${exercise.no}. ${exercise.title}. ${exercise.desc}`;
 }
 
 
@@ -200,7 +326,7 @@ function bindEvents() {
   document.querySelectorAll('[data-nav="complexes"]').forEach((btn) => btn.addEventListener('click', () => switchScreen('complexes')));
   document.querySelectorAll('[data-nav="info"]').forEach((btn) => btn.addEventListener('click', () => switchScreen('info')));
   document.getElementById('infoBtn').addEventListener('click', () => switchScreen('info'));
-  document.getElementById('avatarToggleBtn').addEventListener('click', toggleAvatar);
+  document.getElementById('avatarHeroWrap').addEventListener('click', openAvatarPreview);
   document.querySelectorAll('[data-music-preset]').forEach((btn) => btn.addEventListener('click', () => setMusicPreset(btn.dataset.musicPreset)));
   document.getElementById('musicVolumeInput').addEventListener('input', onMusicVolumeChange);
   document.getElementById('musicVolumeInput').addEventListener('change', onMusicVolumeChange);
@@ -232,6 +358,8 @@ function bindEvents() {
   });
   document.getElementById('resetDayBtn').addEventListener('click', resetTodayMark);
   document.querySelectorAll('[data-close-modal="complex"]').forEach((el) => el.addEventListener('click', closeComplexModal));
+  document.querySelectorAll('[data-close-modal="avatar"]').forEach((el) => el.addEventListener('click', closeAvatarPreview));
+  document.querySelectorAll('[data-gender]').forEach((btn) => btn.addEventListener('click', () => setGender(btn.dataset.gender)));
   document.getElementById('exerciseCloseBtn').addEventListener('click', cancelExercise);
   document.getElementById('exportBtn').addEventListener('click', exportState);
   document.getElementById('importInput').addEventListener('change', importState);
@@ -258,10 +386,41 @@ function switchScreen(screen) {
   document.querySelectorAll('.nav-btn').forEach((b) => b.classList.toggle('active', b.dataset.screen === screen));
 }
 
+
+function openAvatarPreview() {
+  const modal = document.getElementById('avatarModal');
+  const content = document.getElementById('avatarModalContent');
+  const status = getStatusByScore(state.progress.statusScore || 0);
+  const src = getStatusAvatarSrc(state.profile.gender || 'male', state.progress.statusScore || 0);
+  content.innerHTML = `
+    <div class="avatar-preview-content">
+      <img src="${src}" alt="${status.name}" class="avatar-preview-image" />
+      <div class="avatar-preview-text">
+        <div class="eyebrow">Текущий аватар</div>
+        <h3>${status.name}</h3>
+      </div>
+    </div>`;
+  modal.classList.remove('hidden');
+  modal.setAttribute('aria-hidden', 'false');
+}
+
+function closeAvatarPreview() {
+  const modal = document.getElementById('avatarModal');
+  modal.classList.add('hidden');
+  modal.setAttribute('aria-hidden', 'true');
+}
+
 function toggleAvatar() {
   switchScreen('settings');
   document.getElementById('avatarSettingsCard')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
+
+function setGender(gender) {
+  state.profile.gender = gender;
+  saveState();
+  renderAll();
+}
+
 
 function restoreAudioSettings() {
   document.getElementById('musicToggle').checked = !!state.settings.music;
@@ -272,22 +431,25 @@ function restoreAudioSettings() {
 }
 
 
+
 function renderAll() {
+  recomputeProgress();
   renderHeroAvatar();
-  renderAvatarOptions();
   renderMusicSettings();
 
-  document.getElementById('streakValue').textContent = state.progress.streak;
-  document.getElementById('starsValue').textContent = state.progress.stars;
-  document.getElementById('levelValue').textContent = state.progress.level;
-  document.getElementById('reputationValue').textContent = state.progress.reputation;
-  document.getElementById('complexCountValue').textContent = state.progress.completedComplexCount;
+  const status = getStatusByScore(state.progress.statusScore || 0);
+  document.getElementById('heroStatusName').textContent = status.name;
+  document.getElementById('nextStatusHint').textContent = getNextStatusHint(state.progress.statusScore || 0);
+  document.getElementById('heroActiveDaysValue').textContent = state.progress.activeDays;
+  document.getElementById('heroRecordValue').textContent = state.progress.bestStreak;
+  document.getElementById('heroComplexesValue').textContent = state.progress.completedComplexCount;
+
   document.getElementById('activeDaysValue').textContent = state.progress.activeDays;
   document.getElementById('bestStreakValue').textContent = state.progress.bestStreak;
+  document.getElementById('complexCountValue').textContent = state.progress.completedComplexCount;
+  document.getElementById('progressStatusValue').textContent = status.name;
   document.getElementById('musicVolumeInput').value = state.settings.musicVolume ?? 45;
   document.getElementById('musicVolumeValue').textContent = `${state.settings.musicVolume ?? 45}%`;
-  document.getElementById('lastComplexValue').textContent = state.progress.lastCompletedComplexName || '—';
-  document.getElementById('lastDateValue').textContent = state.progress.lastActiveDate ? formatDateShort(state.progress.lastActiveDate) : '—';
   document.getElementById('todayStatus').textContent = hasCompletedToday()
     ? 'Сегодня уже есть завершённый комплекс. Можно пройти ещё один.'
     : 'Сегодня комплекс ещё не завершён.';
@@ -298,35 +460,24 @@ function renderAll() {
   document.getElementById('musicToggle').checked = !!state.settings.music;
   document.getElementById('voiceToggle').checked = !!state.settings.voice;
   document.getElementById('autoVoiceToggle').checked = !!state.settings.autoVoice;
+  document.querySelectorAll('[data-gender]').forEach((btn) => btn.classList.toggle('active', btn.dataset.gender === (state.profile.gender || 'male')));
 
   renderCalendar();
   renderComplexes();
 }
 
 
+
 function renderHeroAvatar() {
   const avatarEl = document.getElementById('avatarHero');
-  const avatar = PRESET_AVATARS.find((item) => item.id === state.profile.avatar) || PRESET_AVATARS[0];
-  avatarEl.textContent = avatar.emoji;
-  avatarEl.className = `hero-avatar ${avatar.className || avatar.id}`;
+  const src = getStatusAvatarSrc(state.profile.gender || 'male', state.progress.statusScore || 0);
+  const status = getStatusByScore(state.progress.statusScore || 0);
+  avatarEl.innerHTML = `<img src="${src}" alt="${status.name}" class="hero-avatar-image" />`;
+  avatarEl.className = 'hero-avatar image-avatar';
 }
 
 function renderAvatarOptions() {
-  const grid = document.getElementById('avatarPresetGrid');
-  if (!grid) return;
-  grid.innerHTML = PRESET_AVATARS.map((item) => `
-    <button class="avatar-option ${state.profile.avatar === item.id ? 'active' : ''}" data-avatar-id="${item.id}">
-      <div class="avatar-option-emoji">${item.emoji}</div>
-      <div class="avatar-option-label">${item.label}</div>
-    </button>
-  `).join('');
-  grid.querySelectorAll('[data-avatar-id]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      state.profile.avatar = btn.dataset.avatarId;
-      saveState();
-      renderAll();
-    });
-  });
+  return;
 }
 
 function renderMusicSettings() {
@@ -519,7 +670,7 @@ function openExercise(complexId, exerciseNo) {
 
   updateTimerUI(duration, duration, 'Сначала прочитайте описание и нажмите «Старт».');
   if (state.settings.voice && state.settings.autoVoice) {
-    speakText(`Упражнение ${exercise.no}. ${exercise.title}. ${exercise.desc}`);
+    speakText(getExerciseSpeechText({ ...exercise, complexId }));
   }
 }
 
@@ -631,29 +782,16 @@ function closeExerciseModal() {
   clearInterval(exerciseTimerId);
 }
 
+
 function completeComplex(complexId) {
   const day = todayISO();
   if (!state.progress.completedDays[day]) state.progress.completedDays[day] = [];
   const dayList = state.progress.completedDays[day];
-  const firstComplexToday = dayList.length === 0;
   const complex = COMPLEXES.find((c) => c.id === complexId);
   if (!dayList.includes(complexId)) {
     dayList.push(complexId);
-    state.progress.completedComplexCount += 1;
-    state.progress.reputation += 10;
-    state.progress.stars += 1;
     state.progress.lastCompletedComplexName = complex.title;
   }
-
-  if (firstComplexToday) {
-    state.progress.activeDays += 1;
-    const diff = state.progress.lastActiveDate ? dayDiff(state.progress.lastActiveDate, day) : 1;
-    state.progress.streak = diff === 1 ? state.progress.streak + 1 : 1;
-    state.progress.bestStreak = Math.max(state.progress.bestStreak, state.progress.streak);
-    state.progress.lastActiveDate = day;
-  }
-
-  state.progress.level = computeLevel(state.progress.reputation);
   saveState();
   renderAll();
   showToast(`Комплекс завершён: ${complex.title}`);
@@ -854,12 +992,12 @@ function speakText(text) {
   stopSpeaking();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'ru-RU';
-  utterance.rate = 0.96;
+  utterance.rate = 0.9;
   utterance.pitch = 1;
   const voices = window.speechSynthesis.getVoices();
   const ruVoice = chooseFemaleRussianVoice(voices);
   if (ruVoice) utterance.voice = ruVoice;
-  utterance.pitch = 1.08;
+  utterance.pitch = 1.02;
   window.speechSynthesis.speak(utterance);
 }
 function chooseFemaleRussianVoice(voices) {

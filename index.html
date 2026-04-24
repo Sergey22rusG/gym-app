@@ -31,42 +31,30 @@
 
     <main class="screen-wrap">
       <section id="screen-home" class="screen active">
-        <div class="hero-card card gradient-card">
-          <div class="hero-avatar-wrap">
-            <div id="avatarHero" class="hero-avatar male">🧑‍💼</div>
-            <button id="avatarToggleBtn" class="ghost-btn small">Выбрать аватар</button>
-          </div>
-          <div class="hero-stats">
-            <div class="eyebrow light">Сделай паузу для здоровья</div>
-            <button id="heroActionBtn" class="ghost-btn hero-action-btn" data-nav="complexes">Перейти к комплексам</button>
-            <p class="muted light">7–10 минут в день. Один полный комплекс = один активный день прогресса.</p>
-            <div class="chip-row">
+        <div class="hero-card card gradient-card hero-card-status">
+          <button id="avatarHeroWrap" class="hero-avatar-wrap hero-avatar-button" aria-label="Посмотреть текущий аватар крупнее">
+            <div id="avatarHero" class="hero-avatar image-avatar"></div>
+          </button>
+          <div class="hero-stats hero-stats-status">
+            <div class="hero-status-group hero-status-group-main">
+              <div class="hero-status-label">Статус</div>
+              <div id="heroStatusName" class="hero-status-name">Новичок</div>
+              <div id="nextStatusHint" class="hero-next-status">До следующего статуса: ещё 4 активных дня</div>
+            </div>
+            <div class="chip-row chip-row-hero">
               <div class="stat-chip">
-                <span class="label">Серия</span>
-                <strong id="streakValue">0</strong>
+                <span class="label">Активные дни</span>
+                <strong id="heroActiveDaysValue">0</strong>
               </div>
               <div class="stat-chip">
-                <span class="label">Звёзды</span>
-                <strong id="starsValue">0</strong>
+                <span class="label">Рекорд серии</span>
+                <strong id="heroRecordValue">0</strong>
               </div>
               <div class="stat-chip">
-                <span class="label">Уровень</span>
-                <strong id="levelValue">1</strong>
+                <span class="label">Комплексов</span>
+                <strong id="heroComplexesValue">0</strong>
               </div>
             </div>
-          </div>
-        </div>
-
-        <div class="summary-grid">
-          <div class="card info-card compact">
-            <div class="stat-title">Репутация</div>
-            <div id="reputationValue" class="big-stat">0</div>
-            <div class="tiny muted">+10 за завершённый комплекс</div>
-          </div>
-          <div class="card info-card compact">
-            <div class="stat-title">Комплексов всего</div>
-            <div id="complexCountValue" class="big-stat">0</div>
-            <div class="tiny muted">выполнено полностью</div>
           </div>
         </div>
 
@@ -78,15 +66,15 @@
           <button class="primary-btn" data-nav="complexes">Перейти к комплексам</button>
         </div>
 
-        <div class="card info-card">
-          <div class="section-title">Как это работает</div>
-          <ul class="clean-list">
-            <li>Нажмите на любой комплекс — он сразу откроется с анимацией.</li>
-            <li>Внутри нажмите на упражнение №1–6, прочитайте карточку и затем запустите его кнопкой «Старт».</li>
-            <li>После нажатия «Старт» запускается таймер и звучит стартовый сигнал.</li>
-            <li>После полного прохождения комплекса обновляется прогресс, серия и рейтинг.</li>
-          </ul>
-        </div>
+        <details class="card settings-card settings-details-card home-details-card">
+          <summary class="settings-summary">Как это работает</summary>
+          <div class="settings-details-content">
+            <p>Нажмите на любой комплекс — он сразу откроется с анимацией.</p>
+            <p>Внутри нажмите на упражнение №1–6, прочитайте карточку и затем запустите его кнопкой «Старт».</p>
+            <p>После нажатия «Старт» запускается таймер и звучит стартовый сигнал.</p>
+            <p>После полного прохождения комплекса обновляется прогресс, статус и аватар.</p>
+          </div>
+        </details>
       </section>
 
       <section id="screen-complexes" class="screen">
@@ -113,12 +101,12 @@
             <div id="bestStreakValue" class="big-stat">0</div>
           </div>
           <div class="card info-card compact">
-            <div class="stat-title">Последний комплекс</div>
-            <div id="lastComplexValue" class="big-stat small-text">—</div>
+            <div class="stat-title">Комплексов всего</div>
+            <div id="complexCountValue" class="big-stat">0</div>
           </div>
           <div class="card info-card compact">
-            <div class="stat-title">Последняя дата</div>
-            <div id="lastDateValue" class="big-stat small-text">—</div>
+            <div class="stat-title">Текущий статус</div>
+            <div id="progressStatusValue" class="big-stat small-text">Новичок</div>
           </div>
         </div>
 
@@ -272,17 +260,22 @@
           <summary class="settings-summary">Как считается прогресс</summary>
           <div class="settings-details-content">
             <p><strong>Активные дни</strong> — это дни, в которые вы полностью завершили хотя бы один комплекс упражнений.</p>
-            <p><strong>Рекорд серии</strong> — это максимальное количество дней подряд без пропусков, когда вы завершали комплекс.</p>
-            <p><strong>Репутация</strong> увеличивается за каждый полностью завершённый комплекс.</p>
-            <p><strong>Звёзды</strong> начисляются за завершённые комплексы и помогают видеть общий прогресс.</p>
-            <p>Если между активными днями есть пропуск, серия дней подряд начинается заново.</p>
+            <p><strong>Рекорд серии</strong> — это максимальное количество дней подряд без пропусков, когда вы завершали хотя бы один комплекс.</p>
+            <p><strong>Комплексов всего</strong> — это общий счётчик всех полностью выполненных комплексов.</p>
+            <p><strong>Статус</strong> и аватар меняются автоматически: 4 / 7 / 10 / 14 активных дней открывают следующий статус.</p>
+            <p>Если 3 дня подряд не выполнять гимнастику, статус снижается на одну ступень. Ещё 3 дня без гимнастики — ещё на одну ступень.</p>
+            <p>Текущая линейка аватаров зависит от выбранного пола персонажа.</p>
           </div>
         </details>
 
 <div class="card settings-card" id="avatarSettingsCard">
-          <div class="setting-title">Аватар героя</div>
-          <div class="tiny muted">Выберите образ, который будет отображаться на главном экране.</div>
-          <div id="avatarPresetGrid" class="avatar-grid"></div>
+          <div class="setting-title">Пол персонажа</div>
+          <div class="tiny muted">Выберите мужскую или женскую линейку. Аватар и статус меняются автоматически.</div>
+          <div class="gender-selector" id="genderSelector">
+            <button class="gender-pill" data-gender="male">Мужской</button>
+            <button class="gender-pill" data-gender="female">Женский</button>
+          </div>
+          <div class="tiny muted" id="avatarAutoHint" style="margin-top:12px;">Текущий статус определяет аватар автоматически.</div>
         </div>
 
         <div class="card settings-card">
@@ -335,6 +328,14 @@
       <div class="pulse-ring"></div>
       <button class="close-btn" id="exerciseCloseBtn">✕</button>
       <div id="exerciseModalContent"></div>
+    </div>
+  </div>
+
+  <div id="avatarModal" class="modal-shell hidden" aria-hidden="true">
+    <div class="modal-backdrop" data-close-modal="avatar"></div>
+    <div class="modal-panel avatar-preview-panel">
+      <button class="close-btn" data-close-modal="avatar">✕</button>
+      <div id="avatarModalContent"></div>
     </div>
   </div>
 
