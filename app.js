@@ -113,7 +113,7 @@ const durationModes = {
 
 const defaultState = () => ({
   profile: { gender: 'male' },
-  settings: { music: true, musicVolume: 45, musicPreset: 'preset1', customMusicData: null, customMusicName: '', voice: true, autoVoice: true, durationMode: 'normal' },
+  settings: { music: true, musicVolume: 45, musicPreset: 'preset1', customMusicData: null, customMusicName: '', autoVoice: true, durationMode: 'normal' },
   progress: {
     reputation: 0,
     stars: 0,
@@ -333,11 +333,6 @@ function bindEvents() {
   document.getElementById('customMelodyInput').addEventListener('change', onCustomMelodyUpload);
   document.getElementById('clearCustomMelodyBtn').addEventListener('click', clearCustomMelody);
   document.getElementById('musicToggle').addEventListener('change', onMusicToggle);
-  document.getElementById('voiceToggle').addEventListener('change', (e) => {
-    state.settings.voice = e.target.checked;
-    saveState();
-    renderAll();
-  });
   document.getElementById('autoVoiceToggle').addEventListener('change', (e) => {
     state.settings.autoVoice = e.target.checked;
     saveState();
@@ -422,13 +417,12 @@ function setGender(gender) {
 }
 
 
+
 function restoreAudioSettings() {
   document.getElementById('musicToggle').checked = !!state.settings.music;
-  document.getElementById('voiceToggle').checked = !!state.settings.voice;
   document.getElementById('autoVoiceToggle').checked = !!state.settings.autoVoice;
-  document.getElementById('musicVolumeInput').value = state.settings.musicVolume ?? 45;
-  document.getElementById('musicVolumeValue').textContent = `${state.settings.musicVolume ?? 45}%`;
 }
+
 
 
 
@@ -450,15 +444,16 @@ function renderAll() {
   document.getElementById('progressStatusValue').textContent = status.name;
   document.getElementById('musicVolumeInput').value = state.settings.musicVolume ?? 45;
   document.getElementById('musicVolumeValue').textContent = `${state.settings.musicVolume ?? 45}%`;
+  const today = todayISO();
+  const partialToday = Object.values(state.progress.completedExercisesByDay[today] || {}).some((arr) => Array.isArray(arr) && arr.length > 0) && !hasCompletedToday();
   document.getElementById('todayStatus').textContent = hasCompletedToday()
     ? 'Сегодня уже есть завершённый комплекс. Можно пройти ещё один.'
-    : 'Сегодня комплекс ещё не завершён.';
+    : (partialToday ? 'Сегодня комплекс начат, но ещё не завершён.' : 'Сегодня комплекс ещё не завершён.');
 
   document.querySelectorAll('.duration-pill[data-duration-mode]').forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.durationMode === state.settings.durationMode);
   });
   document.getElementById('musicToggle').checked = !!state.settings.music;
-  document.getElementById('voiceToggle').checked = !!state.settings.voice;
   document.getElementById('autoVoiceToggle').checked = !!state.settings.autoVoice;
   document.querySelectorAll('[data-gender]').forEach((btn) => btn.classList.toggle('active', btn.dataset.gender === (state.profile.gender || 'male')));
 
@@ -551,26 +546,28 @@ function hasCompletedToday() {
   return Array.isArray(dayData) && dayData.length > 0;
 }
 
+
 function renderComplexes() {
   const list = document.getElementById('complexList');
   list.innerHTML = '';
-  const todayData = state.progress.completedDays[todayISO()] || [];
+  const today = todayISO();
+  const doneToday = state.progress.completedDays[today] || [];
+  const partialMap = state.progress.completedExercisesByDay[today] || {};
 
   COMPLEXES.forEach((complex) => {
-    const doneToday = todayData.includes(complex.id);
+    const isDoneToday = doneToday.includes(complex.id);
+    const partialDoneCount = (partialMap[complex.id] || []).length;
+    const isPartial = !isDoneToday && partialDoneCount > 0;
     const card = document.createElement('button');
     card.className = 'complex-card';
     card.innerHTML = `
       <div class="complex-thumb"><img src="${complex.image}" alt="${complex.title}" /></div>
-      <div class="complex-meta">
-        <div>
-          <h3 class="complex-title">${complex.title}</h3>
-          <div class="muted tiny" style="margin-top:6px;">${complex.subtitle}</div>
-        </div>
-        <div class="badge-row">
+      <div class="complex-meta compact-meta">
+        <div class="badge-row badge-row-complexes">
           <div class="badge">6 упражнений</div>
           <div class="badge">7–10 минут</div>
-          ${doneToday ? '<div class="badge done">Выполнен сегодня</div>' : ''}
+          ${isDoneToday ? '<div class="badge done">Выполнен сегодня</div>' : ''}
+          ${isPartial ? '<div class="badge pending">Не завершён</div>' : ''}
         </div>
       </div>`;
     card.addEventListener('click', () => openComplex(complex.id));
@@ -669,7 +666,7 @@ function openExercise(complexId, exerciseNo) {
   document.getElementById('restartExerciseBtn').addEventListener('click', restartExercise);
 
   updateTimerUI(duration, duration, 'Сначала прочитайте описание и нажмите «Старт».');
-  if (state.settings.voice && state.settings.autoVoice) {
+  if (state.settings.autoVoice) {
     speakText(getExerciseSpeechText({ ...exercise, complexId }));
   }
 }
@@ -988,7 +985,7 @@ function stopSpeaking() {
 }
 
 function speakText(text) {
-  if (!state.settings.voice || !('speechSynthesis' in window)) return;
+  if (!state.settings.autoVoice || !('speechSynthesis' in window)) return;
   stopSpeaking();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'ru-RU';

@@ -1123,3 +1123,18 @@ button:disabled {
     justify-content: stretch;
   }
 }
+
+
+.badge.pending {
+  background: rgba(255, 173, 51, 0.18);
+  color: #8a5a00;
+}
+.compact-meta {
+  min-height: auto;
+}
+.badge-row-complexes {
+  justify-content: flex-start;
+}
+.home-details-card + .home-details-card {
+  margin-top: 14px;
+}
