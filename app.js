@@ -444,11 +444,7 @@ function renderAll() {
   document.getElementById('progressStatusValue').textContent = status.name;
   document.getElementById('musicVolumeInput').value = state.settings.musicVolume ?? 45;
   document.getElementById('musicVolumeValue').textContent = `${state.settings.musicVolume ?? 45}%`;
-  const today = todayISO();
-  const partialToday = Object.values(state.progress.completedExercisesByDay[today] || {}).some((arr) => Array.isArray(arr) && arr.length > 0) && !hasCompletedToday();
-  document.getElementById('todayStatus').textContent = hasCompletedToday()
-    ? 'Сегодня уже есть завершённый комплекс. Можно пройти ещё один.'
-    : (partialToday ? 'Сегодня комплекс начат, но ещё не завершён.' : 'Сегодня комплекс ещё не завершён.');
+  document.getElementById('todayStatus').textContent = getTodayActivityStatusText();
 
   document.querySelectorAll('.duration-pill[data-duration-mode]').forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.durationMode === state.settings.durationMode);
@@ -546,18 +542,54 @@ function hasCompletedToday() {
   return Array.isArray(dayData) && dayData.length > 0;
 }
 
+function getCompletedComplexIdsForDay(dayISO) {
+  const list = state.progress.completedDays?.[dayISO] || [];
+  return Array.isArray(list) ? list : [];
+}
+
+function getPartialComplexIdsForDay(dayISO) {
+  const doneIds = new Set(getCompletedComplexIdsForDay(dayISO));
+  const partialMap = state.progress.completedExercisesByDay?.[dayISO] || {};
+  return Object.entries(partialMap)
+    .filter(([complexId, exercises]) => Array.isArray(exercises) && exercises.length > 0 && !doneIds.has(complexId))
+    .map(([complexId]) => complexId);
+}
+
+function pluralizeComplex(count) {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 === 1 && mod100 !== 11) return 'комплекс';
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return 'комплекса';
+  return 'комплексов';
+}
+
+function getTodayActivityStatusText() {
+  const today = todayISO();
+  const completedCount = getCompletedComplexIdsForDay(today).length;
+  const partialCount = getPartialComplexIdsForDay(today).length;
+
+  if (completedCount > 0 && partialCount > 0) {
+    return `Сегодня выполнено ${completedCount} ${pluralizeComplex(completedCount)}. Не завершено ${partialCount} ${pluralizeComplex(partialCount)}.`;
+  }
+  if (completedCount > 0) {
+    return `Сегодня выполнено ${completedCount} ${pluralizeComplex(completedCount)}. Можно пройти ещё один.`;
+  }
+  if (partialCount > 0) {
+    return `Сегодня есть незавершённые комплексы: ${partialCount}. Чтобы день стал активным, завершите любой комплекс полностью.`;
+  }
+  return 'Сегодня комплекс ещё не завершён.';
+}
 
 function renderComplexes() {
   const list = document.getElementById('complexList');
   list.innerHTML = '';
   const today = todayISO();
-  const doneToday = state.progress.completedDays[today] || [];
-  const partialMap = state.progress.completedExercisesByDay[today] || {};
+  const doneToday = getCompletedComplexIdsForDay(today);
+  const partialToday = new Set(getPartialComplexIdsForDay(today));
 
   COMPLEXES.forEach((complex) => {
     const isDoneToday = doneToday.includes(complex.id);
-    const partialDoneCount = (partialMap[complex.id] || []).length;
-    const isPartial = !isDoneToday && partialDoneCount > 0;
+    const isPartial = partialToday.has(complex.id);
     const card = document.createElement('button');
     card.className = 'complex-card';
     card.innerHTML = `
